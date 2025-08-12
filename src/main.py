@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 # Set the logging directory
-log_dir = os.path.join(os.path.dirname(os.getcwd()), 'logs')
+log_dir = os.path.join(os.path.dirname(os.getcwd()), "logs")
 os.makedirs(log_dir, exist_ok=True)
 
 # Configure the logger
@@ -30,30 +30,40 @@ def main(config_path):
     except yaml.YAMLError as e:
         logger.error(f"Error parsing YAML: {e}")
 
-    # Run the moco-recons 
-    if config['reconstructions']['no_gating']:
-        from no_gating import no_gating
+    # Convert the MRI_Raw.h5 file into npy files
+    if config["preprocessing"]["convert_h5"]:
+        # Loading the convert_ute function
+        from utils.convert_h5_to_npy import convert_ute
+        from utils.dataloader import load_npy_files
 
-    if config['reconstructions']['hard_gating']:
-        from hard_gating import hard_gating
+        # Set the path to import raw and to save the npy files
+        h5_path = os.path.join(config["directories"]["raw"], "MRI_Raw.h5")
+        processed_dir = config["directories"]["processed"]
 
-    if config['reconstructions']['soft_gating']:
-        from soft_gating import soft_gating
+        # Extract the required files and save as npy files
+        convert_ute(h5_path, processed_dir)
 
-    if config['reconstructions']['xdgrasp']:
-        from xdgrasp import xdgrasp
-    
-    if config['reconstructions']['imoco']:
-        from imoco import imoco
+        # Load the npy files
+        encodes = os.listdir(processed_dir)
+        for encode in encodes:
+            logger.info(f"Now loading encode: {encode} ...")
+            encode_path = os.path.join(processed_dir, encode)
+            # ksp, coord, dcf, resp, tr, noise = load_npy_files(encode_path)
 
-    if config['reconstructions']['mocostorm']:
-        from mocostorm import mocostorm
+    else:
+        processed_dir = config["directories"]["processed"]
 
+        # Load the npy files
+        encodes = os.listdir(processed_dir)
+        for encode in encodes:
+            logger.info(f"Now loading encode: {encode} ...")
+            encode_path = os.path.join(processed_dir, encode)
+            # ksp, coord, dcf, resp, tr, noise = load_npy_files(encode_path)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Reconstruct image using motion compensated algorithms."
+        description="Reconstruct image using different motion compensated algorithms."
         )
     parser.add_argument("--config_path", type=str)
 

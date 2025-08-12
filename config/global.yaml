@@ -1,3 +1,6 @@
+preprocessing:
+  convert_h5: false
+
 directories:
   raw: "/Users/sahmed8/Desktop/moco_recon/data/raw"
   processed: "/Users/sahmed8/Desktop/moco_recon/data/processed"
