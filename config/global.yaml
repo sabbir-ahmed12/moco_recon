@@ -1,0 +1,12 @@
+directories:
+  raw: "/Users/sahmed8/Desktop/moco_recon/data/raw"
+  processed: "/Users/sahmed8/Desktop/moco_recon/data/processed"
+  output: "/Users/sahmed8/Desktop/moco_recon/data/output"
+
+reconstructions:
+  no_gating: true
+  hard_gating: true
+  soft_gating: true
+  xdgrasp: true
+  imoco: true
+  mocostorm: true
