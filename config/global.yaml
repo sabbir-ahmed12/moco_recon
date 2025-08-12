@@ -3,7 +3,7 @@ preprocessing:
 
 directories:
   raw: "/Users/sahmed8/Desktop/moco_recon/data/raw"
-  processed: "/Users/sahmed8/Desktop/moco_recon/data/processed"
+  processed: "/Users/sahmed8/Desktop/moco_recon/data/processed/encode_0"
   output: "/Users/sahmed8/Desktop/moco_recon/data/output"
 
 reconstructions:
