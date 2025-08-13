@@ -1,5 +1,6 @@
 import yaml
 import logging
+import numpy as np
 
 # Get the logger
 logger = logging.getLogger(__name__)
@@ -32,6 +33,47 @@ def load_config(config_path):
         logger.error(f"Error parsing YAML: {e}")
 
     return config
+
+
+def minmax_normalize(x, min_val=0.0, max_val=1.0):
+    """
+    Perform min-max normalization of an array, handling NaN values.
+    
+    Args:
+        x: Input array
+        min_val: Minimum value of output range
+        max_val: Maximum value of output range
+        
+    Returns:
+        Normalized array with NaN values preserved
+    """
+    x = np.asarray(x, dtype=np.float64)
+    
+    # Create mask of non-NaN values
+    mask = ~np.isnan(x)
+    
+    if not np.any(mask):
+        # All values are NaN, return original array
+        return x
+    
+    # Calculate min and max only on non-NaN values
+    x_min = np.min(x[mask])
+    x_max = np.max(x[mask])
+    
+    if x_max == x_min:
+        # Handle case where all non-NaN values are identical
+        normalized = np.full_like(x, (min_val + max_val) / 2)
+        normalized[~mask] = np.nan  # Preserve NaN values
+        return normalized
+    
+    # Normalize non-NaN values
+    normalized = np.empty_like(x)
+    normalized[mask] = (x[mask] - x_min) / (x_max - x_min)  # Scale to [0, 1]
+    normalized[mask] = normalized[mask] * (max_val - min_val) + min_val  # Scale to [min_val, max_val]
+    normalized[~mask] = np.nan  # Preserve NaN values
+    
+    return normalized
+    
 
 
 

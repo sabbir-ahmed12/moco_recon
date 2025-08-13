@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Load the internal modules
 from utils.dataloader import load_npy_files
 from utils.misc import load_config
+from utils.auto_fov import auto_fov
 
 def main(config_path):
     # Load the global configuration parameters
@@ -40,6 +41,8 @@ def main(config_path):
 
     # Load the npy files
     ksp, coord, dcf, resp, tr, noise = load_npy_files(processed_dir)
+    coord = auto_fov(ksp, coord, dcf, config["directories"]["output"])
+    logger.info(f"Coordinate shape after autofov: {coord.shape}")
 
 
 if __name__ == "__main__":
