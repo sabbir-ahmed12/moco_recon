@@ -170,7 +170,7 @@ def auto_fov(ksp,
         logger.info(f"Scaling factor: {img_scale}.")
 
         # Save the scaling factor
-        np.save(autofov_diagnostics + "fov_scale_factor.txt", img_scale)
+        np.save(os.path.join(autofov_diagnostics, "fov_scale_factor.txt"), img_scale)
 
         # For radial, inflate the scale(x2) to add conservative fudge for circle-in-sqaure
         if radial:
