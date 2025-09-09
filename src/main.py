@@ -22,6 +22,8 @@ from utils.misc import load_config
 from utils.auto_fov import auto_fov
 
 def main(config_path):
+    start_time = time.time()
+
     # Load the global configuration parameters
     config = load_config(config_path)
 
@@ -41,7 +43,9 @@ def main(config_path):
 
     # Load the npy files
     ksp, coord, dcf, resp, tr, noise = load_npy_files(processed_dir)
-    
+
+    stop_time = time.time()
+    logger.info(f"Total time taken: {(stop_time - start_time)/3600:.2f} hours.")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
