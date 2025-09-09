@@ -41,10 +41,8 @@ def main(config_path):
 
     # Load the npy files
     ksp, coord, dcf, resp, tr, noise = load_npy_files(processed_dir)
-    coord = auto_fov(ksp, coord, dcf, config["directories"]["output"])
-    logger.info(f"Coordinate shape after autofov: {coord.shape}")
-
-
+    
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Reconstruct image using different motion compensated algorithms."
