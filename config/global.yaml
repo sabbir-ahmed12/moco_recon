@@ -1,10 +1,5 @@
 preprocessing:
-  convert_h5: false
-
-directories:
-  raw: "/Users/sahmed8/Desktop/moco_recon/data/raw"
-  processed: "/Users/sahmed8/Desktop/moco_recon/data/processed/encode_0"
-  output: "/Users/sahmed8/Desktop/moco_recon/data/output"
+  convert_h5: true
 
 reconstructions:
   no_gating: true
@@ -13,3 +8,9 @@ reconstructions:
   xdgrasp: true
   imoco: true
   mocostorm: true
+
+device:
+  gpu: true
+
+output:
+  img_shape: [256, 256, 256]

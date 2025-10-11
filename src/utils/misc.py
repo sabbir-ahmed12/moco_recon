@@ -1,6 +1,8 @@
+import os
 import yaml
 import logging
 import numpy as np
+import nibabel as nib
 
 # Get the logger
 logger = logging.getLogger(__name__)
@@ -75,5 +77,24 @@ def minmax_normalize(x, min_val=0.0, max_val=1.0):
     return normalized
     
 
+def save_nifti_volume(volume, filename=None, save_dir=None):
+    """
+    Save an input volume as NifTI.
 
+    Args:
+        volume (numpy.ndarray) : Input volume
+        filename (str) : Name of the file to be saved.
+        save_dir (str) : Path of the output directory
+    """
+    if filename is None:
+        filename = "default_name.nii.gz"
+
+    if save_dir is None:
+        save_dir = os.getcwd()
+
+    logger.info(f"Saving {filename} at {save_dir}.")
+    normalized_output = minmax_normalize(volume, 0, 255)
+    nifti_volume = nib.Nifti1Image(normalized_output, np.eye(4))
+    output_path = os.path.join(save_dir, filename)
+    nib.save(nifti_volume, output_path)
 

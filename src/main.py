@@ -3,6 +3,7 @@ import yaml
 import time
 import argparse
 import logging
+import sigpy as sp
 from datetime import datetime
 
 # Set the logging directory
@@ -18,17 +19,28 @@ logger = logging.getLogger(__name__)
 
 # Load the internal modules
 from utils.dataloader import load_npy_files
-from utils.misc import load_config
+from utils.misc import load_config, save_nifti_volume
 from utils.auto_fov import auto_fov
+from no_gating.no_gating import NoGating
 
-def main(config_path):
+def main(raw_path, config_path):
     start_time = time.time()
 
     # Load the global configuration parameters
     config = load_config(config_path)
 
-    # Get the processed directory
-    processed_dir = config["directories"]["processed"]
+    # Set the device
+    device = -1
+    if config["device"]["gpu"]:
+        device = sp.Device(0)
+
+    # Create the necessary directories
+    recon_dir = os.path.join(raw_path, 'recons')
+    os.makedirs(recon_dir, exist_ok=True)
+
+    processed_dir = os.path.join(recon_dir, 'processed')
+    os.makedirs(processed_dir, exist_ok=True)
+
 
     # Convert the MRI_Raw.h5 file into npy files
     if config["preprocessing"]["convert_h5"]:
@@ -36,22 +48,44 @@ def main(config_path):
         from utils.convert_h5_to_npy import convert_ute
 
         # Set the path to import raw and to save the npy files
-        h5_path = os.path.join(config["directories"]["raw"], "MRI_Raw.h5")
+        h5_path = os.path.join(raw_path, "MRI_Raw.h5")
 
         # Extract the required files and save as npy files
         convert_ute(h5_path, output_dir=processed_dir)
 
+    # Check if there are multiple directories (in-case of multiple encodes)
+    encode_dirs = os.listdir(processed_dir)
+
     # Load the npy files
-    ksp, coord, dcf, resp, tr, noise = load_npy_files(processed_dir)
+    for encode_dir in encode_dirs:
+        processed_file_dir = os.path.join(processed_dir, encode_dir)
+        ksp, coord, dcf, resp, tr, noise = load_npy_files(processed_file_dir)
+
+        # Creating directory to save output for each encode
+        out_dir = os.path.join(processed_file_dir, 'output')
+        os.makedirs(out_dir, exist_ok=True)
+    
+        # Run No_Gating Reconstruction
+        if config['reconstructions']['no_gating']:
+            # Create a directory to save the files
+            save_dir = os.path.join(out_dir, "no_gating")
+            os.makedirs(save_dir, exist_ok=True)
+            
+            no_gating = NoGating(img_shape=config['output']['img_shape'], device=device)
+            output_vol = no_gating.run(ksp, coord, dcf)
+
+            save_nifti_volume(output_vol, filename="no_gating.nii.gz", save_dir=save_dir)
 
     stop_time = time.time()
     logger.info(f"Total time taken: {(stop_time - start_time)/3600:.2f} hours.")
     
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Reconstruct image using different motion compensated algorithms."
         )
-    parser.add_argument("--config_path", type=str)
+    parser.add_argument("-i", "--raw_path", type=str, help="Path to the MRI_Raw.h5 file.")
+    parser.add_argument("--config_path", type=str, help="Path to the YAML configuration file.")
 
     args = parser.parse_args()
-    main(args.config_path)
+    main(args.raw_path, args.config_path)
