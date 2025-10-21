@@ -1,5 +1,5 @@
 preprocessing:
-  convert_h5: true
+  convert_h5: false
 
 reconstructions:
   no_gating: true
@@ -8,6 +8,9 @@ reconstructions:
   xdgrasp: true
   imoco: true
   mocostorm: true
+
+hard_gating:
+  thresh: 50
 
 device:
   gpu: true
