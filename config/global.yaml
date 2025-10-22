@@ -12,6 +12,10 @@ reconstructions:
 hard_gating:
   thresh: 50
 
+soft_gating:
+  thresh: 20
+  gating_weight: 0.8
+
 device:
   gpu: true
 

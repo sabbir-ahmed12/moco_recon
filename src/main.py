@@ -23,6 +23,7 @@ from utils.misc import load_config, save_nifti_volume
 from utils.auto_fov import auto_fov
 from no_gating.no_gating import NoGating
 from hard_gating.hard_gating import HardGating
+from soft_gating.soft_gating import SoftGating
 
 def main(raw_path, config_path):
     start_time = time.time()
@@ -87,6 +88,19 @@ def main(raw_path, config_path):
             output_vol = hard_gating.run(ksp, coord, dcf, resp)
 
             save_nifti_volume(output_vol, filename="hard_gating.nii.gz", save_dir=save_dir)
+
+        # Run Soft-Gating Reconstruction
+        if config['reconstructions']['soft_gating']:
+            # Create a directory to save the files
+            save_dir = os.path.join(out_dir, "soft_gating")
+            os.makedirs(save_dir, exist_ok=True)
+
+            gating_thresh = config['soft_gating']['thresh']
+            gating_weight = config['soft_gating']['gating_weight']
+            soft_gating = SoftGating(img_shape=config['output']['img_shape'], gating_thresh=gating_thresh, gating_weight=gating_weight, device=device)
+            output_vol = soft_gating.run(ksp, coord, dcf, resp)
+
+            save_nifti_volume(output_vol, filename="soft_gating.nii.gz", save_dir=save_dir)
 
     stop_time = time.time()
     logger.info(f"Total time taken: {(stop_time - start_time)/3600:.2f} hours.")
