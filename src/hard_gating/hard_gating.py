@@ -1,4 +1,5 @@
 import os
+import time
 import copy
 import logging
 import numpy as np
@@ -64,6 +65,8 @@ class HardGating(Recon):
 
     
     def run(self, ksp, coord, dcf, resp):
+        start_time = time.time()
+
         ksp = copy.deepcopy(ksp)
         coord = copy.deepcopy(coord)
         dcf = copy.deepcopy(dcf)
@@ -94,6 +97,7 @@ class HardGating(Recon):
         del img_coil, ksp_coil, gated_dcf, gated_coord, gated_ksp
         img = np.transpose(img, (2, 1, 0))
         
-        logger.info(f"Finished hard_gating reconstruction.")
+        stop_time = time.time()
+        logger.info(f"Finished hard_gating reconstruction! Took: {(stop_time - start_time)/3600:.2f} hours.")
 
         return img

@@ -1,3 +1,4 @@
+import time
 import logging
 import numpy as np
 import sigpy as sp
@@ -14,6 +15,8 @@ class NoGating(Recon):
         self.device = device
 
     def run(self, ksp, coord, dcf):
+        start_time = time.time()
+
         logger.info(f"Performing no_gating reconstructions ...")
         coord = sp.to_device(coord, device=self.device)
         ksp = ksp * dcf
@@ -31,6 +34,9 @@ class NoGating(Recon):
         
         del img_coil, ksp_coil, dcf, coord, ksp
         img = np.transpose(img, (2, 1, 0))
+        
+        stop_time = time.time()
+        logger.info(f"Finished no_gating reconstruction! Took: {(stop_time - start_time)/3600:.2f} hours.")
         
         return img
 
