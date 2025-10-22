@@ -28,7 +28,7 @@ class HardGating(Recon):
         self.device = device
 
     
-    def _get_threshold_mask(self, resp, margin=5):
+    def __get_threshold_mask(self, resp, margin=5):
         
         margin = margin  # Remove 5% at both ends to threshold robustly
         # Estimate the standard deviation of the data using median based estimator
@@ -55,7 +55,7 @@ class HardGating(Recon):
         return mask
 
     
-    def _get_gated_arr(self, mask, ksp, coord, dcf):
+    def __get_gated_array(self, mask, ksp, coord, dcf):
         idx = mask == 1
         ksp = ksp[:, idx]
         coord = coord[idx]
@@ -72,8 +72,8 @@ class HardGating(Recon):
         dcf = copy.deepcopy(dcf)
         resp = copy.deepcopy(resp)
 
-        mask = self._get_threshold_mask(resp)
-        gated_ksp, gated_coord, gated_dcf = self._get_gated_arr(mask, ksp, coord, dcf)
+        mask = self.__get_threshold_mask(resp)
+        gated_ksp, gated_coord, gated_dcf = self.__get_gated_array(mask, ksp, coord, dcf)
 
         # Free the memory
         del ksp, coord, dcf, resp
